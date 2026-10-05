@@ -1,0 +1,168 @@
+/* Hospital Management System - Clean Stylesheet */
+
+:root {
+  --primary-color: #0d6efd;
+  --primary-dark: #0a58ca;
+  --secondary-color: #0f766e;
+  --accent-color: #0284c7;
+  --bg-color: #f8fafc;
+  --card-bg: #ffffff;
+  --text-dark: #1e293b;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  color: #ffffff !important;
+}
+
+.navbar-brand i {
+  color: #38bdf8;
+}
+
+.nav-link {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85) !important;
+  padding: 0.5rem 0.9rem !important;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Cards */
+.card {
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+}
+
+.card-header {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  font-weight: 600;
+  padding: 1rem 1.25rem;
+}
+
+/* Stat Cards on Dashboard */
+.stat-card {
+  border-left: 5px solid var(--primary-color);
+  background: white;
+}
+.stat-card.patients { border-left-color: #3b82f6; }
+.stat-card.doctors { border-left-color: #10b981; }
+.stat-card.appointments { border-left-color: #f59e0b; }
+.stat-card.bills { border-left-color: #8b5cf6; }
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.stat-icon.patients { background: #dbeafe; color: #1d4ed8; }
+.stat-icon.doctors { background: #d1fae5; color: #047857; }
+.stat-icon.appointments { background: #fef3c7; color: #b45309; }
+.stat-icon.bills { background: #ede9fe; color: #6d28d9; }
+
+/* Tables */
+.table {
+  vertical-align: middle;
+}
+
+.table th {
+  background-color: #f1f5f9;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.table td {
+  font-size: 0.95rem;
+}
+
+/* Badges */
+.badge-status {
+  padding: 0.4em 0.75em;
+  font-weight: 600;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+/* Printable Bill Styling */
+.bill-box {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 2.5rem;
+  margin-top: 1.5rem;
+}
+
+.hospital-header h2 {
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.bill-table th {
+  background-color: #f8fafc;
+}
+
+/* Print Specific Rules */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  .no-print,
+  .navbar,
+  footer,
+  .btn,
+  .alert,
+  .badge {
+    display: none !important;
+  }
+
+  .bill-box {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .print-header {
+    display: block !important;
+  }
+}

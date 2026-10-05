@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Appointments - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Header & Actions -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <h3 class="fw-bold mb-1 text-dark">Appointment Scheduling</h3>
+      <p class="text-muted mb-0">Book, manage, track, and complete patient consultations with doctors.</p>
+    </div>
+    <div>
+      <a href="{{ url_for('book_appointment') }}" class="btn btn-warning text-dark fw-semibold d-flex align-items-center gap-2">
+        <i class="bi bi-calendar-plus-fill"></i>
+        <span>Book New Appointment</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Search & Filter Card -->
+  <div class="card mb-4 border-0 shadow-sm">
+    <div class="card-body p-3">
+      <form method="GET" action="{{ url_for('appointments') }}" class="row g-2 align-items-center">
+        <div class="col-md-6 col-lg-7">
+          <div class="input-group">
+            <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+            <input type="text" name="q" class="form-control" placeholder="Search by Patient Name, Doctor Name, or Date (YYYY-MM-DD)..." value="{{ search_query }}">
+          </div>
+        </div>
+
+        <div class="col-md-3 col-lg-3">
+          <select name="status" class="form-select">
+            <option value="">All Statuses</option>
+            <option value="Scheduled" {% if current_status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+            <option value="Completed" {% if current_status == 'Completed' %}selected{% endif %}>Completed</option>
+            <option value="Cancelled" {% if current_status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+          </select>
+        </div>
+
+        <div class="col-md-3 col-lg-2 d-flex gap-2">
+          <button type="submit" class="btn btn-primary w-100">Filter</button>
+          {% if search_query or current_status %}
+            <a href="{{ url_for('appointments') }}" class="btn btn-outline-secondary" title="Reset Filters">
+              <i class="bi bi-x-lg"></i>
+            </a>
+          {% endif %}
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Appointments Table -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Appt ID</th>
+              <th>Patient Details</th>
+              <th>Doctor & Speciality</th>
+              <th>Date & Time</th>
+              <th>Reason for Visit</th>
+              <th>Status</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for apt in appointments %}
+            <tr>
+              <td>
+                <span class="badge bg-secondary-subtle text-secondary border fw-bold">{{ apt.appointment_id }}</span>
+              </td>
+              <td>
+                <a href="{{ url_for('patient_details', id=apt.patient.id) }}" class="fw-bold text-decoration-none text-dark">
+                  {{ apt.patient.name }}
+                </a>
+                <div class="small text-muted">{{ apt.patient.patient_id }} &bull; Ph: {{ apt.patient.phone }}</div>
+              </td>
+              <td>
+                <div class="fw-bold text-dark">{{ apt.doctor.name }}</div>
+                <span class="badge bg-info-subtle text-primary border border-info-subtle">{{ apt.doctor.speciality }}</span>
+              </td>
+              <td>
+                <div class="fw-semibold"><i class="bi bi-calendar3 me-1 text-muted"></i>{{ apt.appointment_date }}</div>
+                <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ apt.appointment_time }}</small>
+              </td>
+              <td>
+                <span class="text-truncate d-inline-block" style="max-width: 180px;" title="{{ apt.reason }}">{{ apt.reason }}</span>
+              </td>
+              <td>
+                {% if apt.status == 'Scheduled' %}
+                  <span class="badge bg-primary">Scheduled</span>
+                {% elif apt.status == 'Completed' %}
+                  <span class="badge bg-success">Completed</span>
+                {% else %}
+                  <span class="badge bg-danger">Cancelled</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <div class="d-flex justify-content-center align-items-center gap-1">
+                  <!-- Quick Status Change Buttons -->
+                  {% if apt.status == 'Scheduled' %}
+                    <form method="POST" action="{{ url_for('update_appointment_status', id=apt.id, new_status='Completed') }}" class="d-inline">
+                      <button type="submit" class="btn btn-sm btn-outline-success" title="Mark as Completed">
+                        <i class="bi bi-check-circle"></i>
+                      </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('update_appointment_status', id=apt.id, new_status='Cancelled') }}" class="d-inline">
+                      <button type="submit" class="btn btn-sm btn-outline-warning text-dark" title="Cancel Appointment">
+                        <i class="bi bi-x-circle"></i>
+                      </button>
+                    </form>
+                  {% endif %}
+
+                  <!-- Edit -->
+                  <a href="{{ url_for('edit_appointment', id=apt.id) }}" class="btn btn-sm btn-outline-secondary" title="Edit Appointment">
+                    <i class="bi bi-pencil"></i>
+                  </a>
+
+                  <!-- Delete -->
+                  <form method="POST" action="{{ url_for('delete_appointment', id=apt.id) }}" class="d-inline" onsubmit="return confirm('Delete appointment record {{ apt.appointment_id }}?');">
+                    <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">
+                <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                {% if search_query or current_status %}
+                  No appointments match the given filter criteria.
+                {% else %}
+                  No appointments booked yet. Click "Book New Appointment" to schedule one.
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Hospital Invoice {{ bill.bill_id }} - MEDITRACK{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Breadcrumb & Top Buttons (Hidden in Print) -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2 no-print">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0">
+        {% if session.get('role') == 'patient' %}
+          <li class="breadcrumb-item"><a href="{{ url_for('patient_portal') }}">My Portal</a></li>
+        {% else %}
+          <li class="breadcrumb-item"><a href="{{ url_for('bills') }}">Bills</a></li>
+        {% endif %}
+        <li class="breadcrumb-item active" aria-current="page">{{ bill.bill_id }}</li>
+      </ol>
+    </nav>
+    <div class="d-flex gap-2">
+      <!-- Status Toggle Button (Admin only) -->
+      {% if session.get('logged_in') %}
+        {% if bill.payment_status == 'Pending' %}
+          <form method="POST" action="{{ url_for('update_bill_status', id=bill.id, new_status='Paid') }}" class="d-inline">
+            <button type="submit" class="btn btn-outline-success btn-sm">
+              <i class="bi bi-check2-circle me-1"></i> Mark as Paid
+            </button>
+          </form>
+        {% else %}
+          <form method="POST" action="{{ url_for('update_bill_status', id=bill.id, new_status='Pending') }}" class="d-inline">
+            <button type="submit" class="btn btn-outline-warning text-dark btn-sm">
+              <i class="bi bi-clock-history me-1"></i> Mark as Pending
+            </button>
+          </form>
+        {% endif %}
+      {% endif %}
+
+      <!-- Print Bill Button -->
+      <button onclick="window.print()" class="btn btn-primary btn-sm px-3 shadow-sm">
+        <i class="bi bi-printer-fill me-1"></i> Print Bill
+      </button>
+
+      {% if session.get('role') == 'patient' %}
+        <a href="{{ url_for('patient_portal') }}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i> Back to My Portal
+        </a>
+      {% else %}
+        <a href="{{ url_for('bills') }}" class="btn btn-outline-secondary btn-sm">
+          <i class="bi bi-arrow-left me-1"></i> Back to Bills
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Printable Invoice Box -->
+  <div class="card shadow-sm border-0 bill-box">
+    <div class="card-body p-4 p-md-5">
+
+      <!-- Hospital Header -->
+      <div class="row align-items-center pb-4 mb-4 border-bottom">
+        <div class="col-sm-7">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="bi bi-hospital-fill text-primary fs-2"></i>
+            <h3 class="fw-bold mb-0 text-dark">MEDITRACK</h3>
+          </div>
+          <p class="text-muted small mb-0">
+            Medical Enclave, Health City, New Delhi - 110001<br>
+            Phone: +91 11 2345 6789 &bull; Email: billing@meditrack.com
+          </p>
+        </div>
+        <div class="col-sm-5 text-sm-end mt-3 mt-sm-0">
+          <h5 class="text-uppercase fw-bold text-secondary mb-1">Medical Invoice</h5>
+          <div class="fw-bold fs-5 text-primary">{{ bill.bill_id }}</div>
+          <div class="small text-muted">Date: {{ bill.bill_date.strftime('%d %B, %Y %I:%M %p') if bill.bill_date else 'N/A' }}</div>
+          <div class="mt-2">
+            {% if bill.payment_status == 'Paid' %}
+              <span class="badge bg-success fs-6 px-3 py-1">PAID</span>
+            {% else %}
+              <span class="badge bg-warning text-dark fs-6 px-3 py-1">PAYMENT PENDING</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Patient & Doctor Information -->
+      <div class="row mb-4">
+        <div class="col-md-6 mb-3 mb-md-0">
+          <div class="p-3 bg-light rounded border h-100">
+            <h6 class="text-uppercase fw-bold text-secondary small mb-2">Patient Details</h6>
+            <div class="fw-bold text-dark fs-5">{{ bill.patient.name }}</div>
+            <div class="text-muted small"><strong>Patient ID:</strong> {{ bill.patient.patient_id }}</div>
+            <div class="text-muted small"><strong>Age / Gender:</strong> {{ bill.patient.age }} yrs / {{ bill.patient.gender }}</div>
+            <div class="text-muted small"><strong>Phone:</strong> {{ bill.patient.phone }}</div>
+            <div class="text-muted small"><strong>Blood Group:</strong> {{ bill.patient.blood_group }}</div>
+            <div class="text-muted small"><strong>Address:</strong> {{ bill.patient.address }}</div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="p-3 bg-light rounded border h-100">
+            <h6 class="text-uppercase fw-bold text-secondary small mb-2">Attending Doctor</h6>
+            {% if bill.doctor %}
+              <div class="fw-bold text-dark fs-5">{{ bill.doctor.name }}</div>
+              <div class="text-muted small"><strong>Doctor ID:</strong> {{ bill.doctor.doctor_id }}</div>
+              <div class="text-muted small"><strong>Speciality:</strong> {{ bill.doctor.speciality }}</div>
+              <div class="text-muted small"><strong>Phone:</strong> {{ bill.doctor.phone }}</div>
+              <div class="text-muted small"><strong>Email:</strong> {{ bill.doctor.email }}</div>
+            {% else %}
+              <div class="fw-bold text-dark">General Medical Service</div>
+              <div class="text-muted small">Standard Outpatient Consultation</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Itemized Billing Table -->
+      <div class="table-responsive mb-4">
+        <table class="table table-bordered align-middle bill-table">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 5%;">#</th>
+              <th>Description / Service Category</th>
+              <th class="text-end" style="width: 25%;">Amount (₹)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>
+                <strong>Doctor Consultation Fee</strong>
+                <div class="small text-muted">Specialist clinical consultation & examination</div>
+              </td>
+              <td class="text-end">₹{{ "%.2f"|format(bill.consultation_fee) }}</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>
+                <strong>Prescribed Medicines & Pharmacy</strong>
+                <div class="small text-muted">Medicines dispensed from hospital pharmacy</div>
+              </td>
+              <td class="text-end">₹{{ "%.2f"|format(bill.medicine_charges) }}</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>
+                <strong>Laboratory & Diagnostic Tests</strong>
+                <div class="small text-muted">Pathology, Blood tests, ECG, Imaging</div>
+              </td>
+              <td class="text-end">₹{{ "%.2f"|format(bill.test_charges) }}</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>
+                <strong>Other Hospital Services</strong>
+                <div class="small text-muted">Nursing care, registration & sanitization charges</div>
+              </td>
+              <td class="text-end">₹{{ "%.2f"|format(bill.other_charges) }}</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            {% set subtotal = bill.consultation_fee + bill.medicine_charges + bill.test_charges + bill.other_charges %}
+            <tr>
+              <th colspan="2" class="text-end">Subtotal:</th>
+              <td class="text-end fw-semibold">₹{{ "%.2f"|format(subtotal) }}</td>
+            </tr>
+            <tr>
+              <th colspan="2" class="text-end text-danger">Discount Applied:</th>
+              <td class="text-end text-danger fw-semibold">- ₹{{ "%.2f"|format(bill.discount) }}</td>
+            </tr>
+            <tr class="table-primary fs-5">
+              <th colspan="2" class="text-end fw-bold text-dark">Total Amount Due:</th>
+              <td class="text-end fw-bold text-dark">₹{{ "%.2f"|format(bill.total_amount) }}</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Bill Footer / Stamp / Signatures -->
+      <div class="row pt-4 mt-4 border-top">
+        <div class="col-6">
+          <p class="small text-muted mb-0">
+            <strong>Terms & Notes:</strong><br>
+            1. This is a computer-generated official hospital receipt.<br>
+            2. Please retain this invoice for your health insurance and tax claims.<br>
+            3. For billing inquiries, contact the billing counter at ext. 104.
+          </p>
+        </div>
+        <div class="col-6 text-end">
+          <div class="d-inline-block text-center" style="min-width: 180px;">
+            <div style="height: 50px;"></div>
+            <hr class="mb-1">
+            <small class="fw-semibold text-muted">Authorized Signature & Stamp</small>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

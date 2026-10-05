@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Appointment - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('appointments') }}">Appointments</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Edit Appointment</li>
+        </ol>
+      </nav>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-pencil-square me-2 text-primary"></i>Edit Appointment: {{ appointment.appointment_id }}
+          </h5>
+          <span class="badge bg-secondary">{{ appointment.appointment_id }}</span>
+        </div>
+        <div class="card-body p-4">
+          <form method="POST" action="{{ url_for('edit_appointment', id=appointment.id) }}">
+            <div class="row g-3">
+              
+              <!-- Patient Selection -->
+              <div class="col-md-6">
+                <label for="patient_id" class="form-label fw-semibold">Patient <span class="text-danger">*</span></label>
+                <select class="form-select" id="patient_id" name="patient_id" required>
+                  {% for p in patients %}
+                    <option value="{{ p.id }}" {% if appointment.patient_id == p.id %}selected{% endif %}>
+                      {{ p.name }} ({{ p.patient_id }})
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Doctor Selection -->
+              <div class="col-md-6">
+                <label for="doctor_id" class="form-label fw-semibold">Doctor <span class="text-danger">*</span></label>
+                <select class="form-select" id="doctor_id" name="doctor_id" required>
+                  {% for d in doctors %}
+                    <option value="{{ d.id }}" {% if appointment.doctor_id == d.id %}selected{% endif %}>
+                      {{ d.name }} — {{ d.speciality }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Appointment Date -->
+              <div class="col-md-6">
+                <label for="appointment_date" class="form-label fw-semibold">Date <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="appointment_date" name="appointment_date" value="{{ appointment.appointment_date }}" required>
+              </div>
+
+              <!-- Appointment Time -->
+              <div class="col-md-6">
+                <label for="appointment_time" class="form-label fw-semibold">Time Slot <span class="text-danger">*</span></label>
+                <select class="form-select" id="appointment_time" name="appointment_time" required>
+                  {% for slot in ["09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM", "11:00 AM", "11:30 AM", "12:00 PM", "02:00 PM", "02:30 PM", "03:00 PM", "03:30 PM", "04:00 PM", "04:30 PM", "05:00 PM"] %}
+                    <option value="{{ slot }}" {% if appointment.appointment_time == slot %}selected{% endif %}>{{ slot }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Status -->
+              <div class="col-md-6">
+                <label for="status" class="form-label fw-semibold">Appointment Status <span class="text-danger">*</span></label>
+                <select class="form-select" id="status" name="status" required>
+                  <option value="Scheduled" {% if appointment.status == 'Scheduled' %}selected{% endif %}>Scheduled</option>
+                  <option value="Completed" {% if appointment.status == 'Completed' %}selected{% endif %}>Completed</option>
+                  <option value="Cancelled" {% if appointment.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+              </div>
+
+              <!-- Reason -->
+              <div class="col-md-12">
+                <label for="reason" class="form-label fw-semibold">Reason for Visit <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="reason" name="reason" rows="3" required>{{ appointment.reason }}</textarea>
+              </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+              <a href="{{ url_for('appointments') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+              <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-check-lg me-1"></i> Update Appointment
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

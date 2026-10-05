@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Book Doctor Appointment - MEDITRACK{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('patient_portal') }}">My Portal</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Book Appointment</li>
+        </ol>
+      </nav>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+          <h5 class="fw-bold mb-0 text-dark">
+            <i class="bi bi-calendar-plus text-primary me-2"></i>Book an Appointment with a Specialist
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          
+          <div class="alert alert-light border mb-4 d-flex align-items-center gap-3">
+            <i class="bi bi-person-circle fs-3 text-primary"></i>
+            <div>
+              <div class="fw-bold">{{ patient.name }} ({{ patient.patient_id }})</div>
+              <small class="text-muted">Booking for yourself &bull; Phone: {{ patient.phone }}</small>
+            </div>
+          </div>
+
+          <form method="POST" action="{{ url_for('patient_book_appointment') }}">
+            <div class="row g-3">
+              
+              <!-- Select Doctor -->
+              <div class="col-12">
+                <label for="doctor_id" class="form-label fw-semibold">Choose Doctor / Speciality <span class="text-danger">*</span></label>
+                <select class="form-select" id="doctor_id" name="doctor_id" required>
+                  <option value="" disabled selected>-- Select a Doctor --</option>
+                  {% for d in doctors %}
+                    <option value="{{ d.id }}">
+                      {{ d.name }} — {{ d.speciality }} (Consultation Fee: ₹{{ "%.0f"|format(d.consultation_fee) }} &bull; Available: {{ d.available_days }})
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Appointment Date -->
+              <div class="col-md-6">
+                <label for="appointment_date" class="form-label fw-semibold">Preferred Date <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="appointment_date" name="appointment_date" required>
+              </div>
+
+              <!-- Appointment Time -->
+              <div class="col-md-6">
+                <label for="appointment_time" class="form-label fw-semibold">Preferred Time Slot <span class="text-danger">*</span></label>
+                <select class="form-select" id="appointment_time" name="appointment_time" required>
+                  <option value="" disabled selected>-- Select Time Slot --</option>
+                  <option value="09:00 AM">09:00 AM</option>
+                  <option value="09:30 AM">09:30 AM</option>
+                  <option value="10:00 AM">10:00 AM</option>
+                  <option value="10:30 AM">10:30 AM</option>
+                  <option value="11:00 AM">11:00 AM</option>
+                  <option value="11:30 AM">11:30 AM</option>
+                  <option value="12:00 PM">12:00 PM</option>
+                  <option value="02:00 PM">02:00 PM</option>
+                  <option value="02:30 PM">02:30 PM</option>
+                  <option value="03:00 PM">03:00 PM</option>
+                  <option value="03:30 PM">03:30 PM</option>
+                  <option value="04:00 PM">04:00 PM</option>
+                  <option value="04:30 PM">04:30 PM</option>
+                  <option value="05:00 PM">05:00 PM</option>
+                </select>
+              </div>
+
+              <!-- Reason for Visit -->
+              <div class="col-12">
+                <label for="reason" class="form-label fw-semibold">Symptoms or Reason for Consultation <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="reason" name="reason" rows="3" placeholder="Briefly describe your symptoms or reason for visit..." required></textarea>
+              </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+              <a href="{{ url_for('patient_portal') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+              <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                <i class="bi bi-calendar-check me-1"></i> Confirm Booking
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

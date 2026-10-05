@@ -1,0 +1,201 @@
+{% extends "base.html" %}
+
+{% block title %}Patient Portal - MEDITRACK{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Welcome Banner -->
+  <div class="card shadow-sm border-0 mb-4 bg-primary text-white">
+    <div class="card-body p-4">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-white text-primary rounded-circle p-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 65px; height: 65px;">
+            <i class="bi bi-person-heart fs-1"></i>
+          </div>
+          <div>
+            <h4 class="fw-bold mb-1">Welcome, {{ patient.name }}!</h4>
+            <div class="opacity-75 small">
+              Patient ID: <strong>{{ patient.patient_id }}</strong> &bull; Registered on {{ patient.registration_date.strftime('%d %b, %Y') if patient.registration_date else 'N/A' }}
+            </div>
+          </div>
+        </div>
+        <div>
+          <a href="{{ url_for('patient_book_appointment') }}" class="btn btn-warning text-dark fw-semibold px-3 py-2 shadow-sm d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-plus-fill"></i>
+            <span>Book New Appointment</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Patient Demographic Cards -->
+  <div class="row g-4 mb-4">
+    <!-- Basic Info -->
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <i class="bi bi-person-vcard text-primary me-2"></i><strong>My Profile</strong>
+        </div>
+        <div class="card-body">
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item d-flex justify-content-between px-0">
+              <span class="text-muted">Age / Gender:</span>
+              <span class="fw-semibold">{{ patient.age }} yrs / {{ patient.gender }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between px-0">
+              <span class="text-muted">Blood Group:</span>
+              <span class="badge bg-danger text-white">{{ patient.blood_group }}</span>
+            </li>
+            <li class="list-group-item d-flex justify-content-between px-0">
+              <span class="text-muted">Phone:</span>
+              <span class="fw-semibold">{{ patient.phone }}</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact & Address -->
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <i class="bi bi-geo-alt text-primary me-2"></i><strong>Address Details</strong>
+        </div>
+        <div class="card-body">
+          <p class="text-muted mb-1 small">Residential Address:</p>
+          <p class="fw-semibold text-dark mb-0">{{ patient.address }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medical Problem -->
+    <div class="col-md-4">
+      <div class="card h-100 border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <i class="bi bi-heart-pulse text-danger me-2"></i><strong>Registered Health Problem</strong>
+        </div>
+        <div class="card-body">
+          <div class="p-3 bg-light rounded border">
+            <p class="mb-0 text-dark fw-medium">{{ patient.disease }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 1: My Appointments -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+      <span class="fw-bold fs-6">
+        <i class="bi bi-calendar-check text-primary me-2"></i>My Booked Appointments
+      </span>
+      <a href="{{ url_for('patient_book_appointment') }}" class="btn btn-sm btn-outline-primary">
+        + Book Another Appointment
+      </a>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Appt ID</th>
+              <th>Doctor Name</th>
+              <th>Speciality</th>
+              <th>Date & Time</th>
+              <th>Reason</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for apt in patient.appointments %}
+            <tr>
+              <td><span class="badge bg-secondary-subtle text-secondary border fw-bold">{{ apt.appointment_id }}</span></td>
+              <td class="fw-semibold text-dark">{{ apt.doctor.name }}</td>
+              <td><span class="badge bg-info-subtle text-primary border border-info-subtle">{{ apt.doctor.speciality }}</span></td>
+              <td>
+                <div><i class="bi bi-calendar3 text-muted me-1"></i>{{ apt.appointment_date }}</div>
+                <small class="text-muted"><i class="bi bi-clock me-1"></i>{{ apt.appointment_time }}</small>
+              </td>
+              <td>{{ apt.reason }}</td>
+              <td>
+                {% if apt.status == 'Scheduled' %}
+                  <span class="badge bg-primary">Scheduled</span>
+                {% elif apt.status == 'Completed' %}
+                  <span class="badge bg-success">Completed</span>
+                {% else %}
+                  <span class="badge bg-danger">Cancelled</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">
+                <i class="bi bi-calendar-x fs-2 d-block mb-1"></i>
+                You do not have any appointments yet. Click "Book New Appointment" to schedule one.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: My Bills & Invoices -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+      <span class="fw-bold fs-6">
+        <i class="bi bi-receipt text-primary me-2"></i>My Hospital Invoices & Receipts
+      </span>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Invoice ID</th>
+              <th>Attending Doctor</th>
+              <th>Date</th>
+              <th>Total Amount</th>
+              <th>Payment Status</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for b in patient.bills %}
+            <tr>
+              <td><span class="badge bg-secondary-subtle text-secondary border fw-bold">{{ b.bill_id }}</span></td>
+              <td>{{ b.doctor.name if b.doctor else 'General Service' }}</td>
+              <td>{{ b.bill_date.strftime('%d %b, %Y') if b.bill_date else 'N/A' }}</td>
+              <td class="fw-bold text-success fs-6">₹{{ "%.2f"|format(b.total_amount) }}</td>
+              <td>
+                {% if b.payment_status == 'Paid' %}
+                  <span class="badge bg-success">Paid</span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">Pending</span>
+                {% endif %}
+              </td>
+              <td class="text-center">
+                <a href="{{ url_for('bill_details', id=b.id) }}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-printer me-1"></i> View / Print Invoice
+                </a>
+              </td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="6" class="text-center py-4 text-muted">
+                <i class="bi bi-receipt-cutoff fs-2 d-block mb-1"></i>
+                No bills or receipts generated yet.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

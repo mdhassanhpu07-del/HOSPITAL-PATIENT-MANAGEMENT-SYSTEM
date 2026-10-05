@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Book Appointment - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('appointments') }}">Appointments</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Book Appointment</li>
+        </ol>
+      </nav>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+          <h5 class="fw-bold mb-0 text-warning text-dark">
+            <i class="bi bi-calendar-plus-fill me-2 text-warning"></i>Schedule Patient Appointment
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <form method="POST" action="{{ url_for('book_appointment') }}">
+            <div class="row g-3">
+              
+              <!-- Patient Selection -->
+              <div class="col-md-6">
+                <label for="patient_id" class="form-label fw-semibold">Select Patient <span class="text-danger">*</span></label>
+                <select class="form-select" id="patient_id" name="patient_id" required>
+                  <option value="" disabled {% if not selected_patient_id %}selected{% endif %}>-- Choose Patient --</option>
+                  {% for p in patients %}
+                    <option value="{{ p.id }}" {% if selected_patient_id == p.id %}selected{% endif %}>
+                      {{ p.name }} ({{ p.patient_id }}) - {{ p.phone }}
+                    </option>
+                  {% endfor %}
+                </select>
+                <div class="form-text">Patient not listed? <a href="{{ url_for('add_patient') }}" target="_blank">Add Patient</a></div>
+              </div>
+
+              <!-- Doctor Selection -->
+              <div class="col-md-6">
+                <label for="doctor_id" class="form-label fw-semibold">Select Doctor <span class="text-danger">*</span></label>
+                <select class="form-select" id="doctor_id" name="doctor_id" required>
+                  <option value="" disabled {% if not selected_doctor_id %}selected{% endif %}>-- Choose Doctor --</option>
+                  {% for d in doctors %}
+                    <option value="{{ d.id }}" {% if selected_doctor_id == d.id %}selected{% endif %}>
+                      {{ d.name }} — {{ d.speciality }} (Fee: ₹{{ "%.0f"|format(d.consultation_fee) }})
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Appointment Date -->
+              <div class="col-md-6">
+                <label for="appointment_date" class="form-label fw-semibold">Appointment Date <span class="text-danger">*</span></label>
+                <input type="date" class="form-control" id="appointment_date" name="appointment_date" required>
+              </div>
+
+              <!-- Appointment Time -->
+              <div class="col-md-6">
+                <label for="appointment_time" class="form-label fw-semibold">Appointment Time Slot <span class="text-danger">*</span></label>
+                <select class="form-select" id="appointment_time" name="appointment_time" required>
+                  <option value="" disabled selected>-- Select Time Slot --</option>
+                  <option value="09:00 AM">09:00 AM</option>
+                  <option value="09:30 AM">09:30 AM</option>
+                  <option value="10:00 AM">10:00 AM</option>
+                  <option value="10:30 AM">10:30 AM</option>
+                  <option value="11:00 AM">11:00 AM</option>
+                  <option value="11:30 AM">11:30 AM</option>
+                  <option value="12:00 PM">12:00 PM</option>
+                  <option value="02:00 PM">02:00 PM</option>
+                  <option value="02:30 PM">02:30 PM</option>
+                  <option value="03:00 PM">03:00 PM</option>
+                  <option value="03:30 PM">03:30 PM</option>
+                  <option value="04:00 PM">04:00 PM</option>
+                  <option value="04:30 PM">04:30 PM</option>
+                  <option value="05:00 PM">05:00 PM</option>
+                </select>
+                <div class="form-text">System prevents duplicate bookings for the same doctor at the same slot.</div>
+              </div>
+
+              <!-- Reason for Visit -->
+              <div class="col-md-12">
+                <label for="reason" class="form-label fw-semibold">Reason for Visit / Symptoms <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="reason" name="reason" rows="3" placeholder="Describe the medical concern, follow-up, or symptoms..." required></textarea>
+              </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+              <a href="{{ url_for('appointments') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+              <button type="submit" class="btn btn-warning text-dark px-4 fw-semibold">
+                <i class="bi bi-calendar-check me-1"></i> Confirm Appointment
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

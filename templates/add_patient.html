@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Add Patient - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('patients') }}">Patients</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Add Patient</li>
+        </ol>
+      </nav>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3">
+          <h5 class="fw-bold mb-0 text-primary">
+            <i class="bi bi-person-plus-fill me-2"></i>Register New Patient
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <form method="POST" action="{{ url_for('add_patient') }}">
+            <div class="row g-3">
+              
+              <!-- Full Name -->
+              <div class="col-md-8">
+                <label for="name" class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="name" name="name" placeholder="e.g. Ramesh Kumar" required>
+              </div>
+
+              <!-- Age -->
+              <div class="col-md-4">
+                <label for="age" class="form-label fw-semibold">Age <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="age" name="age" min="1" max="125" placeholder="e.g. 35" required>
+              </div>
+
+              <!-- Gender -->
+              <div class="col-md-6">
+                <label for="gender" class="form-label fw-semibold">Gender <span class="text-danger">*</span></label>
+                <select class="form-select" id="gender" name="gender" required>
+                  <option value="" disabled selected>-- Select Gender --</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+
+              <!-- Blood Group -->
+              <div class="col-md-6">
+                <label for="blood_group" class="form-label fw-semibold">Blood Group <span class="text-danger">*</span></label>
+                <select class="form-select" id="blood_group" name="blood_group" required>
+                  <option value="" disabled selected>-- Select Blood Group --</option>
+                  <option value="A+">A+</option>
+                  <option value="A-">A-</option>
+                  <option value="B+">B+</option>
+                  <option value="B-">B-</option>
+                  <option value="O+">O+</option>
+                  <option value="O-">O-</option>
+                  <option value="AB+">AB+</option>
+                  <option value="AB-">AB-</option>
+                </select>
+              </div>
+
+              <!-- Phone -->
+              <div class="col-md-12">
+                <label for="phone" class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                <input type="tel" class="form-control" id="phone" name="phone" placeholder="e.g. 9876543210" required>
+                <div class="form-text">Enter a valid 10-digit mobile number.</div>
+              </div>
+
+              <!-- Address -->
+              <div class="col-md-12">
+                <label for="address" class="form-label fw-semibold">Address <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="address" name="address" rows="2" placeholder="Residential street address, city, state" required></textarea>
+              </div>
+
+              <!-- Disease / Problem -->
+              <div class="col-md-12">
+                <label for="disease" class="form-label fw-semibold">Disease / Health Problem <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="disease" name="disease" rows="2" placeholder="e.g. Chest pain, Fever and persistent cough, Skin allergy" required></textarea>
+              </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+              <a href="{{ url_for('patients') }}" class="btn btn-outline-secondary px-4">Cancel</a>
+              <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-save me-1"></i> Save Patient
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

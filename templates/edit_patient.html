@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Patient - Hospital Management System{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('patients') }}">Patients</a></li>
+          <li class="breadcrumb-item"><a href="{{ url_for('patient_details', id=patient.id) }}">{{ patient.name }}</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Edit Patient</li>
+        </ol>
+      </nav>
+
+      <div class="card shadow-sm border-0">
+        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+          <h5 class="fw-bold mb-0 text-primary">
+            <i class="bi bi-pencil-square me-2"></i>Edit Patient: {{ patient.name }}
+          </h5>
+          <span class="badge bg-secondary">{{ patient.patient_id }}</span>
+        </div>
+        <div class="card-body p-4">
+          <form method="POST" action="{{ url_for('edit_patient', id=patient.id) }}">
+            <div class="row g-3">
+              
+              <!-- Full Name -->
+              <div class="col-md-8">
+                <label for="name" class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ patient.name }}" required>
+              </div>
+
+              <!-- Age -->
+              <div class="col-md-4">
+                <label for="age" class="form-label fw-semibold">Age <span class="text-danger">*</span></label>
+                <input type="number" class="form-control" id="age" name="age" min="1" max="125" value="{{ patient.age }}" required>
+              </div>
+
+              <!-- Gender -->
+              <div class="col-md-6">
+                <label for="gender" class="form-label fw-semibold">Gender <span class="text-danger">*</span></label>
+                <select class="form-select" id="gender" name="gender" required>
+                  <option value="Male" {% if patient.gender == 'Male' %}selected{% endif %}>Male</option>
+                  <option value="Female" {% if patient.gender == 'Female' %}selected{% endif %}>Female</option>
+                  <option value="Other" {% if patient.gender == 'Other' %}selected{% endif %}>Other</option>
+                </select>
+              </div>
+
+              <!-- Blood Group -->
+              <div class="col-md-6">
+                <label for="blood_group" class="form-label fw-semibold">Blood Group <span class="text-danger">*</span></label>
+                <select class="form-select" id="blood_group" name="blood_group" required>
+                  {% for bg in ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'] %}
+                    <option value="{{ bg }}" {% if patient.blood_group == bg %}selected{% endif %}>{{ bg }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <!-- Phone -->
+              <div class="col-md-12">
+                <label for="phone" class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                <input type="tel" class="form-control" id="phone" name="phone" value="{{ patient.phone }}" required>
+              </div>
+
+              <!-- Address -->
+              <div class="col-md-12">
+                <label for="address" class="form-label fw-semibold">Address <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="address" name="address" rows="2" required>{{ patient.address }}</textarea>
+              </div>
+
+              <!-- Disease / Problem -->
+              <div class="col-md-12">
+                <label for="disease" class="form-label fw-semibold">Disease / Health Problem <span class="text-danger">*</span></label>
+                <textarea class="form-control" id="disease" name="disease" rows="2" required>{{ patient.disease }}</textarea>
+              </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+              <a href="{{ url_for('patient_details', id=patient.id) }}" class="btn btn-outline-secondary px-4">Cancel</a>
+              <button type="submit" class="btn btn-primary px-4">
+                <i class="bi bi-check-lg me-1"></i> Update Patient
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
